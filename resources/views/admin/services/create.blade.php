@@ -49,7 +49,7 @@
     <!-- ====== samll_pag (plain) ====== -->
     <div>
       <label for="samll_pag" class="block text-sm font-medium text-slate-700 mb-1">Small paragraph (short excerpt)</label>
-      <input type="text" id="small_pag" name="small_pag" placeholder="Short description" value="{{ old('small_pag') }}"
+      <input type="text" id="small_pag" name="small_pag" placeholder="Short description" value="{{ old('samll_pag') }}"
              class="w-full rounded-lg border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-2.5 border">
     </div>
 
@@ -73,7 +73,7 @@
                 class="w-full rounded-lg border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-2.5 border hidden">Additional note with <span style="background-color: #fef08a;">highlight</span>.</textarea>
     </div>
 
-
+    <!-- ====== sec_heading (CKEditor) ====== -->
     <div>
       <label for="sec_heading" class="block text-sm font-medium text-slate-700 mb-1">Secondary heading (CKEditor)</label>
       <textarea id="sec_heading" name="sec_heading" rows="2"
@@ -87,6 +87,7 @@
              class="w-full rounded-lg border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-2.5 border">
     </div>
 
+    <!-- ====== sec_paragraph (CKEditor) ====== -->
     <div>
       <label for="sec_paragraph" class="block text-sm font-medium text-slate-700 mb-1">Secondary paragraph (CKEditor)</label>
       <textarea id="sec_paragraph" name="sec_paragraph" rows="4"
@@ -151,6 +152,11 @@
       <p class="text-xs text-slate-400 mt-2">Click "Add listing" to add a new heading + summary pair.</p>
     </div>
 
+    <div>
+      <label for="sec_imag" class="block text-sm font-medium text-slate-700 mb-1">External image</label>
+      <input type="file" id="sec_imag" name="ext_images[]" accept="multiple" multiple
+             class="w-full rounded-lg border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-2.5 border">
+    </div>
     <!-- submit -->
     <div class="pt-4 border-t border-slate-200 flex justify-end">
       <button type="submit" class="inline-flex items-center px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
@@ -225,22 +231,29 @@
       return div;
     }
 
+    // Add new listing when button clicked
     addBtn.addEventListener('click', function() {
       const newItem = createListingItem('', '');
       container.appendChild(newItem);
-
+      // re-attach remove events (delegation already handles)
     });
 
+    // Remove listing (event delegation on container)
     container.addEventListener('click', function(e) {
       const removeBtn = e.target.closest('.remove-listing');
       if (!removeBtn) return;
       const listingItem = removeBtn.closest('.listing-item');
       if (!listingItem) return;
-
+      // prevent removing the last one? we allow remove any, but ensure at least one remains? optional.
+      // if (container.children.length <= 1) {
+      //   alert('At least one listing is required.');
+      //   return;
+      // }
       listingItem.remove();
     });
 
-
+    // (Optional) If you want to keep at least one, but we allow full dynamic.
+    // Also we want to make sure the initial one can be removed too – that's fine.
 
     console.log('✅ Dynamic listings ready – click "Add listing" to add heading+summary pairs.');
   })();

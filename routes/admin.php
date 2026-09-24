@@ -15,8 +15,8 @@ Route::post('/system/login', [AdminController::class, 'systemLogin'])->name('sys
 Route::prefix('admin')->middleware(['super_admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::post('/logout', [AdminController::class, 'AdminLogout'])->name('admin.logout');
-    Route::get('/forgetIndex',[AdminController::class, 'forgetIndex'])->name('forget');
-    Route::post('/password/forget',[AdminController::class, 'forgetPassword'])->name('password.forget');
+    Route::get('/forgetIndex', [AdminController::class, 'forgetIndex'])->name('forget');
+    Route::post('/password/forget', [AdminController::class, 'forgetPassword'])->name('password.forget');
     Route::controller(SettingsController::class)->group(function () {
         Route::get('/header', 'header')->name('header');
         Route::get('header/{id}', 'edit')->name('header.edit');
@@ -62,24 +62,23 @@ Route::prefix('admin')->middleware(['super_admin'])->group(function () {
     });
 
     Route::controller(ServiceController::class)->group(function () {
-    Route::get('/index', 'index')->name('service.index');
+        Route::get('/index', 'index')->name('service.index');
         Route::get('/create', 'create')->name('service.create');
-        Route::post('/service/add','store')->name('service.add');
-        Route::get('/service/edit/{id}','edit')->name('service.edit');
-        Route::post('/service/{id}/update','update')->name('service.update');
-        Route::delete('/service/{id}/delete','destroy')->name('service.delete');
+        Route::post('/service/add', 'store')->name('service.add');
+        Route::get('/service/edit/{id}', 'edit')->name('service.edit');
+        Route::post('/service/{id}/update', 'update')->name('service.update');
+        Route::delete('/service/{id}/delete', 'destroy')->name('service.delete');
+        Route::delete('/service/{id}/external-image','deleteExternalImage')->name('service.external-image.delete');
 
     });
 
-    Route::controller(ServiceCatControoler::class)->group(function(){
-        Route::get('/ser/cate','index')->name('serCat.index');
-        Route::post('/ser/cate/store','store')->name('ser.cat.add');
-        Route::post('/ser/{id}/update','update')->name('ser.update');
-        Route::get('/ser/{id}/edit','edit')->name('ser.edit');
-        Route::delete('ser/{id}/delete','destroy')->name('ser.delete');
+    Route::controller(ServiceCatControoler::class)->group(function () {
+        Route::get('/ser/cate', 'index')->name('serCat.index');
+        Route::post('/ser/cate/store', 'store')->name('ser.cat.add');
+        Route::post('/ser/{id}/update', 'update')->name('ser.update');
+        Route::get('/ser/{id}/edit', 'edit')->name('ser.edit');
+        Route::delete('ser/{id}/delete', 'destroy')->name('ser.delete');
     });
-
-
 
     Route::get('/getQuery', [ContactController::class, 'getQuery'])->name('getQuery');
 });

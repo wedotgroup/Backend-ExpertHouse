@@ -64,8 +64,10 @@
         </div>
 
         <!-- Form Actions -->
+        
         <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-200/80 mt-6">
-            <a href=""
+          
+            <a href="{{ route('category') }}"
                class="px-6 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all">
                 Cancel
             </a>

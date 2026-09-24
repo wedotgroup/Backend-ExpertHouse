@@ -21,3 +21,4 @@ Route::get('/singleService/{slug}',[ApiManagementController::class, 'singleServi
 Route::get('/getSixService',[ApiManagementController::class, 'getSixService']);
 Route::get('/getFourService',[ApiManagementController::class, 'getFourService']);
 Route::post('/cat/contact',[ApiManagementController::class, 'CategoryEmail']);
+

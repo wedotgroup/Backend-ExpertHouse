@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Mail\CategoryRequestMail;
 use App\Mail\ContactMail;
 use App\Models\Banner;
 use App\Models\Brand;
@@ -14,6 +13,7 @@ use App\Models\InsightPages;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\CategoryRequestMail;
 
 class ApiManagementController extends Controller
 {
@@ -284,6 +284,8 @@ class ApiManagementController extends Controller
     try {
 
         $data = Service::where('slug',$slug)->first();
+         
+
         return response()->json([
             'message' => 'Service data here',
             'data' => $data,
@@ -330,7 +332,7 @@ class ApiManagementController extends Controller
         }
     }
 
-    public function CategoryEmail(Request $request){
+public function CategoryEmail(Request $request){
         try{
         $data = [
             "name"=>$request->name,
@@ -351,5 +353,7 @@ class ApiManagementController extends Controller
         }
 
     }
+
+
 
 }
