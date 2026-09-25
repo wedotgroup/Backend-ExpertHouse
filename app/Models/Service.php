@@ -24,7 +24,8 @@ class Service extends Model
         'list',
         'serviceCat_id',
         'slug',
-        'ext_images'
+        'ext_images',
+        'content'
     ];
 
     protected $casts = [

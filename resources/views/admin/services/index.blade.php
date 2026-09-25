@@ -146,6 +146,9 @@
                                     class="fas fa-sort ml-1 text-slate-300"></i></th>
                             <th class="px-4 py-3.5 text-left sortable" data-sort="third_heading">third_heading <i
                                     class="fas fa-sort ml-1 text-slate-300"></i></th>
+                                    <th class="px-4 py-3.5 text-left sortable" data-sort="third_heading">External Content<i
+                                    class="fas fa-sort ml-1 text-slate-300"></i></th>
+
 
                             <th class="px-4 py-3.5 text-left sortable" data-sort="serviceCat_id">serviceCategory <i
                                     class="fas fa-sort ml-1 text-slate-300"></i></th>
@@ -188,6 +191,10 @@
                                 </td>
                                 <td class="px-4 py-3.5 align-middle">
                                     {{ $service->third_heading ?? '' }}
+                                </td>
+
+                                <td class="px-4 py-3.5 align-middle">
+                                    {{ Str::limit($service->content,30) ?? '' }}
                                 </td>
 
                                 <td class="px-4 py-3.5 align-middle">

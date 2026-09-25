@@ -9,7 +9,9 @@ use App\Http\Controllers\Admin\ServiceCatControoler;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Backend\AdminController;
+use App\Http\Controllers\CKEditorController;
 use Illuminate\Support\Facades\Route;
+
 
 Route::post('/system/login', [AdminController::class, 'systemLogin'])->name('system.login');
 Route::prefix('admin')->middleware(['super_admin'])->group(function () {
@@ -81,4 +83,8 @@ Route::prefix('admin')->middleware(['super_admin'])->group(function () {
     });
 
     Route::get('/getQuery', [ContactController::class, 'getQuery'])->name('getQuery');
+    Route::post('/ckeditor/upload', [
+    CKEditorController::class,
+    'upload'
+])->name('ckeditor.upload');
 });

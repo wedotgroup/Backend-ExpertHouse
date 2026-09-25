@@ -27,6 +27,7 @@ class ServiceController extends Controller
 
     public function store(Request $request)
     {
+
         $request->validate([
             'heading' => 'required|string|max:255',
 
@@ -48,6 +49,7 @@ class ServiceController extends Controller
             'listing_summary.*' => 'nullable|string',
             'ext_images' => 'nullable|array',
             'ext_images.*' => 'nullable',
+            'content' => 'nullable',
             'serviceCat_id' => 'required|exists:service_categories,id',
         ]);
 
@@ -135,17 +137,13 @@ class ServiceController extends Controller
 
         $data['list'] = json_encode($listing);
         $data['slug'] = Str::slug($request->heading);
+        $data['content'] = $request->content;
         Service::create($data);
 
         return redirect()
             ->route('service.index')
             ->with('success', 'Service created successfully.');
     }
-
-    // public function show(Service $service)
-    // {
-    //     return view('', compact('service'));
-    // }
 
     public function edit($id)
     {
@@ -315,18 +313,14 @@ class ServiceController extends Controller
 
             'listing_summary' => 'nullable|array',
             'listing_summary.*' => 'nullable|string',
-
+            'content' => 'nullable',
             'ext_images' => 'nullable|array',
             'ext_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
 
             'serviceCat_id' => 'required|exists:service_categories,id',
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Basic Data
-        |--------------------------------------------------------------------------
-        */
+        
 
         $data = $request->except([
             'main_img',
@@ -336,11 +330,7 @@ class ServiceController extends Controller
             'ext_images',
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | External Images
-        |--------------------------------------------------------------------------
-        */
+
 
         $extImages = [];
 
@@ -451,7 +441,7 @@ class ServiceController extends Controller
         $data['list'] = json_encode($listing);
 
         $data['slug'] = Str::slug($request->heading);
-
+        $data['content'] = $request->content;
         $service->update($data);
 
         return redirect()
@@ -519,14 +509,11 @@ class ServiceController extends Controller
             ], 404);
         }
 
-
         $filePath = public_path($imagePath);
 
         if (file_exists($filePath)) {
             unlink($filePath);
         }
-
-
 
         $extImages = array_values(
             array_filter(
