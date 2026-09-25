@@ -2,7 +2,7 @@
 
 @section('content')
 
-    
+
 
     @if ($errors->any())
         @foreach ($errors->all() as $error)
@@ -28,7 +28,6 @@
 
 
 
-    <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
 
 
 
@@ -748,16 +747,16 @@
     </div>
 
 
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function(
+        document.addEventListener('DOMContentLoaded', function() {
+
             class MyUploadAdapter {
 
                 constructor(loader) {
                     this.loader = loader;
-                    this.xhr = null;
                 }
-
 
                 upload() {
 
@@ -769,141 +768,58 @@
 
                             data.append('upload', file);
 
-
-                            const csrfElement =
-                                document.querySelector(
-                                    'meta[name="csrf-token"]'
-                                );
-
-
-                            if (!csrfElement) {
-
-                                reject(
-                                    'CSRF token not found.'
-                                );
-
-                                return;
-                            }
-
-
                             const csrfToken =
-                                csrfElement.getAttribute('content');
+                                document
+                                .querySelector('meta[name="csrf-token"]')
+                                .getAttribute('content');
 
+                            fetch("{{ route('ckeditor.upload') }}", {
+                                    method: 'POST',
 
-                            this.xhr = new XMLHttpRequest();
+                                    headers: {
+                                        'X-CSRF-TOKEN': csrfToken,
+                                        'Accept': 'application/json'
+                                    },
 
+                                    body: data
+                                })
 
-                            this.xhr.open(
-                                'POST',
-                                "{{ route('ckeditor.upload') }}",
-                                true
-                            );
+                                .then(response => response.json())
 
+                                .then(result => {
 
-                            this.xhr.setRequestHeader(
-                                'X-CSRF-TOKEN',
-                                csrfToken
-                            );
+                                    console.log('CKEditor upload:', result);
 
-                            this.xhr.setRequestHeader(
-                                'Accept',
-                                'application/json'
-                            );
+                                    if (result.url) {
 
-
-                            this.xhr.responseType = 'json';
-
-
-                            this.xhr.addEventListener(
-                                'load',
-                                () => {
-
-                                    console.log(
-                                        'CKEditor Upload Status:',
-                                        this.xhr.status
-                                    );
-
-
-                                    console.log(
-                                        'CKEditor Upload Response:',
-                                        this.xhr.response
-                                    );
-
-
-                                    if (
-                                        this.xhr.status >= 200 &&
-                                        this.xhr.status < 300
-                                    ) {
-
-                                        const response =
-                                            this.xhr.response;
-
-
-                                        if (
-                                            response &&
-                                            response.url
-                                        ) {
-
-                                            resolve({
-                                                default: response.url
-                                            });
-
-                                        } else {
-
-                                            reject(
-                                                response?.error?.message ||
-                                                'Image URL not returned.'
-                                            );
-
-                                        }
+                                        resolve({
+                                            default: result.url
+                                        });
 
                                     } else {
 
-                                        const response =
-                                            this.xhr.response;
-
-
                                         reject(
-                                            response?.error?.message ||
-                                            `Upload failed (${this.xhr.status})`
+                                            result?.error?.message ||
+                                            'Image upload failed.'
                                         );
 
                                     }
 
-                                }
-                            );
+                                })
 
-
-                            this.xhr.addEventListener(
-                                'error',
-                                () => {
+                                .catch(error => {
 
                                     console.error(
-                                        'CKEditor upload network error.'
+                                        'CKEditor upload error:',
+                                        error
                                     );
-
 
                                     reject(
-                                        'Cannot upload file.'
+                                        error.message ||
+                                        'Cannot upload image.'
                                     );
 
-                                }
-                            );
-
-
-                            this.xhr.addEventListener(
-                                'abort',
-                                () => {
-
-                                    reject(
-                                        'Upload aborted.'
-                                    );
-
-                                }
-                            );
-
-
-                            this.xhr.send(data);
+                                });
 
                         });
 
@@ -911,18 +827,8 @@
 
                 }
 
-
-                abort() {
-
-                    if (this.xhr) {
-                        this.xhr.abort();
-                    }
-
-                }
-
+                abort() {}
             }
-
-
 
 
             function MyCustomUploadAdapterPlugin(editor) {
@@ -934,9 +840,7 @@
                         return new MyUploadAdapter(loader);
 
                     };
-
             }
-
 
 
             const editorIds = [
@@ -951,26 +855,27 @@
 
             editorIds.forEach(function(id) {
 
-                const textarea =
+                const element =
                     document.getElementById(id);
 
 
-                if (!textarea) {
+                if (!element) {
+
+                    console.warn(
+                        'CKEditor element not found:',
+                        id
+                    );
+
                     return;
                 }
 
 
-                const initialContent =
-                    textarea.value;
-
-
                 ClassicEditor
-                    .create(textarea, {
+                    .create(element, {
 
                         extraPlugins: [
                             MyCustomUploadAdapterPlugin
                         ],
-
 
                         toolbar: [
                             'heading',
@@ -994,30 +899,21 @@
 
                     })
 
+                    .then(editor => {
 
-                    .then(function(editor) {
-
-                        editor.setData(
-                            initialContent
-                        );
-
-
-                        window[id + 'Editor'] =
-                            editor;
-
+                        window[id + 'Editor'] = editor;
 
                         console.log(
-                            'CKEditor ready:',
+                            'CKEditor initialized:',
                             id
                         );
 
                     })
 
-
-                    .catch(function(error) {
+                    .catch(error => {
 
                         console.error(
-                            'CKEditor error:',
+                            'CKEditor initialization failed:',
                             id,
                             error
                         );
@@ -1025,183 +921,6 @@
                     });
 
             });
-
-
-
-
-            const container =
-                document.getElementById(
-                    'listingsContainer'
-                );
-
-
-            const addBtn =
-                document.getElementById(
-                    'addListingBtn'
-                );
-
-
-            function escapeHtml(value) {
-
-                if (
-                    value === null ||
-                    value === undefined
-                ) {
-                    return '';
-                }
-
-
-                return String(value)
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')
-                    .replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#039;');
-
-            }
-
-
-            function createListingItem(
-                headingValue = '',
-                summaryValue = ''
-            ) {
-
-                const div =
-                    document.createElement('div');
-
-
-                div.className =
-                    'listing-item bg-slate-50 p-4 rounded-lg border border-slate-200 relative';
-
-
-                div.innerHTML = `
-
-                    <div class="flex items-start gap-3">
-
-                        <div class="flex-1 space-y-3">
-
-                            <div>
-
-                                <label
-                                    class="block text-xs font-medium
-                                           text-slate-600 mb-1">
-
-                                    Listing Heading
-
-                                </label>
-
-                                <input
-                                    type="text"
-                                    name="listing_heading[]"
-                                    placeholder="Feature heading"
-                                    value="${escapeHtml(headingValue)}"
-                                    class="w-full rounded border-slate-300
-                                           shadow-sm sm:text-sm
-                                           px-3 py-1.5 border">
-
-                            </div>
-
-
-                            <div>
-
-                                <label
-                                    class="block text-xs font-medium
-                                           text-slate-600 mb-1">
-
-                                    Summary
-
-                                </label>
-
-                                <textarea
-                                    name="listing_summary[]"
-                                    rows="2"
-                                    placeholder="Short summary"
-                                    class="w-full rounded border-slate-300
-                                           shadow-sm sm:text-sm
-                                           px-3 py-1.5 border"
-                                >${escapeHtml(summaryValue)}</textarea>
-
-                            </div>
-
-                        </div>
-
-
-                        <button
-                            type="button"
-                            class="remove-listing
-                                   text-slate-400
-                                   hover:text-red-500 p-1"
-                            title="Remove listing">
-
-                            ✕
-
-                        </button>
-
-                    </div>
-
-                `;
-
-
-                return div;
-
-            }
-
-
-            if (addBtn && container) {
-
-                addBtn.addEventListener(
-                    'click',
-                    function() {
-
-                        const newItem =
-                            createListingItem(
-                                '',
-                                ''
-                            );
-
-
-                        container.appendChild(
-                            newItem
-                        );
-
-                    }
-                );
-
-
-                container.addEventListener(
-                    'click',
-                    function(event) {
-
-                        const removeBtn =
-                            event.target.closest(
-                                '.remove-listing'
-                            );
-
-
-                        if (!removeBtn) {
-                            return;
-                        }
-
-
-                        const listingItem =
-                            removeBtn.closest(
-                                '.listing-item'
-                            );
-
-
-                        if (listingItem) {
-                            listingItem.remove();
-                        }
-
-                    }
-                );
-
-            }
-
-
-            console.log(
-                'Service edit page initialized successfully.'
-            );
 
         });
     </script>
